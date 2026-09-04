@@ -1,85 +1,66 @@
 # Spec-driven plan
 
-Work only against SPEC.md + FEATURES.md + MATERIALS.md. Each phase ends with something visible in the Floot preview.
+Work only against the docs. Each phase ends with something visible in the Floot preview.
 
 ## Phase 0 — Grounding
 
-- Vision, spec, feature map, materials spec, data model, this plan
-- Floot project created: AI Tutor
-
-Exit: docs exist.
+Docs + Floot project.
 
 **Floot project:** `c8878c21-29d0-49c7-b044-c63b1d29ad38`  
 **GitHub:** `ltappa-wq/ai-tutor`
 
 ## Phase 1 — UI scaffold (no backend)
 
-Today + session + parent status + a Materials screen with General + per-course folders and sample files.
-
-Exit: preview looks like the product. Data is fake.
+Today + session + parent status + Materials folders. Sample data.
 
 ## Phase 2 — Household backend
 
-Database + auth. Schema from DATA-MODEL.md. Seed household, two students, courses, folders, sample materials, assignments, today's plan.
-
-Exit: Today and Materials read from the DB.
+Database + Google parent SSO + student username/password + guardian invites.
 
 ## Phase 3 — Materials ingest (upload first)
 
-- Upload into a folder
-- Ingest AI: kind, summary, extracted items
-- Course snapshot rewrite
-- Plan generation reads extracts for tomorrow + 7 days
-
-Exit: drop a PDF in Algebra, see a homework extract and a planner hint without Schoology.
+Upload, ingest AI, course snapshots, 7-day extracts into the planner.
 
 ## Phase 4 — Schoology crawl
 
-- Connect Schoology for a student
-- Adapter + 14:00 household-tz scheduled job
-- 24h new files + 7-day dues
-- Dedup, store, ingest, snapshots, crawl_run log
-- Upload-only fallback if token dies
-
-Exit: a 2pm run (or "Run crawl now") brings in a real or stubbed section file.
+Household parent-portal connection + 14:00 job.
 
 ## Phase 5 — Real tutor loop
 
-`@floot/ai` for plan, steps, coach, quiz grounded in repo materials. Step-then-answer contract.
+Plan, steps, coach, quiz. Step-then-answer.
 
 ## Phase 6 — Parent close-the-loop
 
-DailyStatus + crawl status + upcoming assessments on the parent page.
+- Parent home for every kid
+- `daily_status` written from sessions even without an explicit end-night tap
+- **23:00 household-tz digest email to every guardian** (DIGEST.md)
+
+Exit: a sample household gets one mail covering today / tomorrow / next 7 days.
 
 ## Phase 7 — Hardening
 
-Empty/error states, AI cost cap, reconnect Schoology, publish.
+Empty states, cost cap, reconnect, publish.
 
 ## Phase 8 — Backlog
 
-- Other LMS adapters
-- Photo worksheet, voice
-- Lecture audio pipeline
-- Student-owned logins
-- Native stores
+Other LMS adapters, photo/voice, lecture audio, digest mute, native stores.
 
 ## Decision log
 
 | Date | Decision |
 | --- | --- |
-| 2026-09-03 | Family-first household app, not school SaaS |
-| 2026-09-03 | Steps first, then show the worked answer |
-| 2026-09-03 | Grades 6–12; under-13 parent-managed |
-| 2026-09-03 | Floot runtime; GitHub is the spec repo |
-| 2026-09-03 | Schoology daily crawl at 14:00 household tz |
+| 2026-09-03 | Family-first household app |
+| 2026-09-03 | Steps first, then the worked answer |
+| 2026-09-03 | Parent Google SSO; kids get parent-assigned username/password |
+| 2026-09-03 | Co-parents are equal; invites; all guardians get household email |
+| 2026-09-03 | Schoology crawl 14:00 household tz; read-only |
 | 2026-09-03 | Repo = per-course folders + General |
-| 2026-09-03 | Ingest AI feeds tomorrow + 7-day plan |
-| 2026-09-03 | LMS is read-only. Never submit back. |
 | 2026-09-03 | Upload-only is a first-class fallback |
+| 2026-09-03 | Guardian digest at 23:00 household tz, every night |
 
 ## How we work
 
 1. Change the spec.
-2. Change the plan phase notes.
-3. Implement only that slice in Floot.
-4. Checkpoint in Floot after each phase.
+2. Change the plan.
+3. Implement that slice in Floot.
+4. Checkpoint.
