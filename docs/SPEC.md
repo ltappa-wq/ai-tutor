@@ -2,7 +2,7 @@
 
 Status: draft for first Floot build  
 Audience: builder + future-us  
-Source of truth with VISION.md and PLAN.md
+Source of truth with VISION.md, FEATURES.md, and PLAN.md
 
 ## 1. Goal
 
@@ -10,7 +10,8 @@ Ship a working household app where:
 
 - A parent creates the household and student profiles.
 - A student sees **today's plan**, starts a **guided session**, and marks work done.
-- The tutor uses AI to plan, quiz, and coach — never to emit a finished take-home product.
+- The tutor walks steps first, then may show the worked answer so they can check themselves.
+- The tutor never emits a finished take-home essay, lab, or project.
 - A parent sees tonight's status.
 
 ## 2. Personas & accounts
@@ -26,8 +27,7 @@ Ship a working household app where:
 
 - Email/password (Floot auth).
 - One login per person. Parent account owns the household.
-- Student may share a device; student profile is selected after login *or* student has their own login linked to the household.
-- **Decision for first slice:** parent login + switchable student profiles on the same device is acceptable for family v1. Separate student logins are v1.1.
+- **Decision for first slice:** parent login + switchable student profiles on the same device. Separate student logins are P2.
 
 ### Safety / age
 
@@ -47,7 +47,7 @@ See DATA-MODEL.md. Summary:
 - PlanDay (date + ordered items)
 - PlanItem (assignment, study block, break, quiz)
 - Session (guided work against a PlanItem)
-- Artifact (quiz, outline, checklist progress, recap)
+- Artifact (quiz, outline, checklist progress, recap, worked solution)
 - DailyStatus (parent digest)
 
 ## 4. Core loop
@@ -58,12 +58,15 @@ Evening / after school
   → Plan already generated (or generate now)
   → Tap first incomplete item
   → Guided session (timer + steps + tutor chat constrained to the item)
+  → After steps: show worked answer for check
   → Mark done or park with a "stuck" note
   → Next item
   → End of night → Daily status for parent
 ```
 
 ## 5. Feature requirements
+
+P0/P1/P2/Out catalog lives in FEATURES.md. This section is the P0 behavior spec.
 
 ### 5.1 Today (student home)
 
@@ -105,13 +108,13 @@ For an assignment item:
 
 1. Restate the goal in one sentence.
 2. Break into 3–7 checkable steps.
-3. Work one step at a time.
+3. Work one step at a time. Check the student's move before advancing.
 4. Tutor chat is scoped to this assignment.
-5. If the student asks for the answer, the tutor:
-   - asks what they have tried,
-   - gives a hint or worked *similar* example,
-   - checks understanding with a tiny question,
-   - does **not** produce a paste-ready completed assignment.
+5. After the path is walked, show the fully worked solution and the final answer so they can check a worksheet.
+6. If they demand the answer on message one: compress the steps (do not run a 20-turn purity ritual at 9:40pm), then show the worked answer.
+7. Offer one sibling problem of the same type.
+
+Still forbidden: a paste-ready completed essay, lab report, or multi-page project.
 
 Session UI:
 
@@ -119,13 +122,14 @@ Session UI:
 - Checklist
 - Chat
 - "I'm stuck" → captures a note for the parent digest
+- Reveal check / worked answer
 - Done / Keep going
 
 ### 5.4 Prepare / study
 
 For a study or test-prep item:
 
-- Student pastes notes or describes the topic (photo-of-notes is v1.1).
+- Student pastes notes or describes the topic (photo-of-notes is P1).
 - Tutor produces: 5-question check, then weak-spot recap.
 - Score stored as an Artifact.
 
@@ -140,7 +144,7 @@ Allowed:
 
 Not allowed:
 
-- Full essay / lab report / code solution that can be submitted as-is
+- Full essay / lab report / take-home project they can put their name on
 
 ### 5.6 Parent status
 
@@ -152,7 +156,7 @@ A single page / section:
   - stuck notes
   - tomorrow's hard dues
 
-No grade scraping in v1.
+No grade scraping in v1. Session transcript open is P1.
 
 ### 5.7 Courses & assignments CRUD
 
@@ -166,30 +170,32 @@ Parent or student can:
 
 System posture:
 
-- Tutor, not ghostwriter.
+- Tutor, then checker. Not ghostwriter.
 - Age-appropriate, calm, specific.
-- Prefer questions and next steps over lectures.
+- Prefer questions and next steps over lectures — until the path is done, then show the checkable answer.
 - Cite the student's own materials when present.
 - If materials are missing, ask for them before inventing content.
-- Math: walk the method; do not only emit the final number unless it is a check after the student attempted it.
+- Math / short-answer: solver contract in FEATURES.md.
 - Writing: coach structure and evidence; keep the student's voice.
 
 Every AI feature must log:
 
-- purpose (plan | quiz | coach | critique)
+- purpose (plan | quiz | coach | critique | solve)
 - student_id
 - plan_item_id if any
 - model + token usage (for cost control)
 
 ## 7. Non-goals (v1)
 
+See FEATURES.md Out + P2. Headline nos:
+
+- Teacher hub / lesson plans / IEP tools
+- Community Q&A and leaderboards
+- Live human tutor marketplace
 - Google Classroom / Canvas sync
-- Speech-to-text lecture pipeline (known future; not v1)
-- Multi-school teacher dashboards
-- Marketplace of tutors
-- Native mobile stores (web + PWA first; Floot can publish later)
-- Real-time multiplayer study rooms
-- Full rich-text Google-Docs clone
+- Lecture-audio pipeline
+- District SSO
+- Auto-submit to a school portal
 
 ## 8. UX constraints
 
@@ -208,6 +214,7 @@ Track, household-private:
 - stuck marked
 - assignment created
 - quiz completed
+- worked answer revealed
 
 No third-party ad pixels.
 
