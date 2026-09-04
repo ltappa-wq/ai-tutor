@@ -1,96 +1,81 @@
 # Spec-driven plan
 
-Work only against SPEC.md. Each phase ends with something visible in the Floot preview.
+Work only against SPEC.md + FEATURES.md + MATERIALS.md. Each phase ends with something visible in the Floot preview.
 
-## Phase 0 — Grounding (this commit)
+## Phase 0 — Grounding
 
-- Vision, spec, data model, this plan
+- Vision, spec, feature map, materials spec, data model, this plan
 - Floot project created: AI Tutor
-- Design principles + tokens (calm evening study tool, not toy classroom)
 
-Exit: docs exist; Floot project id recorded below.
+Exit: docs exist.
 
 **Floot project:** `c8878c21-29d0-49c7-b044-c63b1d29ad38`  
 **GitHub:** `ltappa-wq/ai-tutor`
 
 ## Phase 1 — UI scaffold (no backend)
 
-Build the student **Today** page with hardcoded sample data:
+Today + session + parent status + a Materials screen with General + per-course folders and sample files.
 
-- Header (student, date, time budget)
-- Plan list with statuses
-- Start-next CTA
-- Session panel or `/session/:itemId` with timer, steps, coach placeholder
-- Add-assignment sheet
-- Parent status view (`/parent` or a tab)
-
-Exit: preview looks like the product. Clicking around works. Data is fake.
+Exit: preview looks like the product. Data is fake.
 
 ## Phase 2 — Household backend
 
-Provision Floot:
+Database + auth. Schema from DATA-MODEL.md. Seed household, two students, courses, folders, sample materials, assignments, today's plan.
 
-- database
-- auth
+Exit: Today and Materials read from the DB.
 
-Schema from DATA-MODEL.md. Seed one household, one parent, two student profiles, courses, assignments, a plan for today.
+## Phase 3 — Materials ingest (upload first)
 
-Endpoints (POST/GET only):
+- Upload into a folder
+- Ingest AI: kind, summary, extracted items
+- Course snapshot rewrite
+- Plan generation reads extracts for tomorrow + 7 days
 
-- `GET /api/today` — plan + items for selected student + date
-- `POST /api/assignments` — create
-- `POST /api/plan/generate` — build/replace remaining items
-- `POST /api/sessions/start`
-- `POST /api/sessions/event` — step check, stuck, complete
-- `GET /api/parent/status`
+Exit: drop a PDF in Algebra, see a homework extract and a planner hint without Schoology.
 
-Exit: Today reads from the DB. Refresh persists.
+## Phase 4 — Schoology crawl
 
-## Phase 3 — Real tutor loop
+- Connect Schoology for a student
+- Adapter + 14:00 household-tz scheduled job
+- 24h new files + 7-day dues
+- Dedup, store, ingest, snapshots, crawl_run log
+- Upload-only fallback if token dies
 
-Wire `@floot/ai` (or connected model resource) to:
+Exit: a 2pm run (or "Run crawl now") brings in a real or stubbed section file.
 
-1. Plan generation
-2. Step breakdown for an assignment
-3. Constrained session coach
-4. 5-question prep quiz
+## Phase 5 — Real tutor loop
 
-Prompt files live as helpers. Refusal rules from SPEC §6 are in the system prompt, not vibes.
+`@floot/ai` for plan, steps, coach, quiz grounded in repo materials. Step-then-answer contract.
 
-Exit: a live session produces steps and a quiz from a real assignment title + notes.
+## Phase 6 — Parent close-the-loop
 
-## Phase 4 — Parent close-the-loop
+DailyStatus + crawl status + upcoming assessments on the parent page.
 
-- DailyStatus row written when the student ends the night or last session completes
-- Parent page is live data
-- Optional email digest via `@floot/email` (off by default)
+## Phase 7 — Hardening
 
-Exit: parent can answer "did they work?" without opening the chat log.
+Empty/error states, AI cost cap, reconnect Schoology, publish.
 
-## Phase 5 — Hardening
+## Phase 8 — Backlog
 
-- Empty / error / loading states
-- Cost cap per household per day on AI calls
-- Basic tests on plan-generation helper and session rules
-- Publish web preview domain
-
-## Phase 6 — Backlog (not now)
-
+- Other LMS adapters
+- Photo worksheet, voice
+- Lecture audio pipeline
 - Student-owned logins
-- Photo-of-worksheet / vision homework
-- Lecture audio → notes → quiz (Plaud-class pipeline)
-- Google Classroom import
-- FSD-style "Joe Mode" kid lock + time windows
-- Native TestFlight
+- Native stores
 
 ## Decision log
 
 | Date | Decision |
 | --- | --- |
 | 2026-09-03 | Family-first household app, not school SaaS |
-| 2026-09-03 | Coach-not-cheat is a spec rule, not a slogan |
-| 2026-09-03 | v1 student ages 6–12 grades; under-13 is parent-managed |
-| 2026-09-03 | Floot is the app runtime; this GitHub repo is the spec repo |
+| 2026-09-03 | Steps first, then show the worked answer |
+| 2026-09-03 | Grades 6–12; under-13 parent-managed |
+| 2026-09-03 | Floot runtime; GitHub is the spec repo |
+| 2026-09-03 | Schoology daily crawl at 14:00 household tz |
+| 2026-09-03 | Repo = per-course folders + General |
+| 2026-09-03 | Ingest AI feeds tomorrow + 7-day plan |
+| 2026-09-03 | LMS is read-only. Never submit back. |
+| 2026-09-03 | Upload-only is a first-class fallback |
 
 ## How we work
 
