@@ -10,6 +10,7 @@ Passwords and LMS tokens are not columns. See AUTH.md.
 - name
 - timezone (default `America/Chicago`)
 - crawl_hour_local int default 14
+- created_by_user_id nullable
 - created_at
 
 ## app_user
@@ -18,18 +19,30 @@ Passwords and LMS tokens are not columns. See AUTH.md.
 - household_id
 - role: `parent` | `student`
 - display_name
-- email nullable  -- parents from Google; students usually null
-- google_sub nullable  -- parent SSO subject, unique
-- username nullable  -- student login, unique when present
+- email nullable
+- google_sub nullable
+- username nullable
 - created_at
 
-Student passwords live in Floot auth. Parent has no app password.
+Student passwords live in Floot auth. Parents have no app password. All `role=parent` rows in a household are equal.
+
+## household_invite
+
+- id
+- household_id
+- email
+- invited_by_user_id
+- token_hash
+- status: `pending` | `accepted` | `revoked` | `expired`
+- expires_at
+- accepted_user_id nullable
+- created_at
 
 ## student_profile
 
 - id
 - household_id
-- user_id  -- required once the parent has assigned a login
+- user_id
 - display_name
 - grade_level nullable
 - work_block_minutes default 20
@@ -39,17 +52,15 @@ Student passwords live in Floot auth. Parent has no app password.
 
 ## lms_connection
 
-Household-level parent portal (v1), not one token per kid.
-
 - id
 - household_id
-- student_id nullable  -- null when scope is `household`
+- student_id nullable
 - scope: `household` | `student`
 - provider: `schoology` | `classroom` | `canvas` | `manual`
 - portal_role: `parent` | `student` | `district_app`
 - status: `connected` | `needs_reauth` | `disabled` | `error`
-- external_user_id nullable  -- parent portal user id
-- portal_username nullable  -- identifier only
+- external_user_id nullable
+- portal_username nullable
 - token_expires_at nullable
 - last_crawl_at nullable
 - last_error text nullable
@@ -248,6 +259,7 @@ Household-level parent portal (v1), not one token per kid.
 
 - app_user (username) unique where username is not null
 - app_user (google_sub) unique where google_sub is not null
+- household_invite (household_id, email) where status = pending
 - assignment (student_id, status, due_on)
 - material (student_id, folder_id, created_at desc)
 - extracted_item (student_id, due_on)
