@@ -2,6 +2,7 @@
 
 Postgres, snake_case columns. Floot + Kysely. UUIDs for ids. `timestamptz` for times.
 Files live in Floot private storage; this schema holds metadata and extracts.
+Passwords and LMS tokens are not columns. See AUTH.md.
 
 ## household
 
@@ -15,16 +16,20 @@ Files live in Floot private storage; this schema holds metadata and extracts.
 
 - id
 - household_id
-- email
 - role: `parent` | `student`
 - display_name
+- email nullable  -- parents from Google; students usually null
+- google_sub nullable  -- parent SSO subject, unique
+- username nullable  -- student login, unique when present
 - created_at
+
+Student passwords live in Floot auth. Parent has no app password.
 
 ## student_profile
 
 - id
 - household_id
-- user_id nullable
+- user_id  -- required once the parent has assigned a login
 - display_name
 - grade_level nullable
 - work_block_minutes default 20
@@ -34,18 +39,31 @@ Files live in Floot private storage; this schema holds metadata and extracts.
 
 ## lms_connection
 
+Household-level parent portal (v1), not one token per kid.
+
 - id
 - household_id
-- student_id
+- student_id nullable  -- null when scope is `household`
+- scope: `household` | `student`
 - provider: `schoology` | `classroom` | `canvas` | `manual`
+- portal_role: `parent` | `student` | `district_app`
 - status: `connected` | `needs_reauth` | `disabled` | `error`
-- external_user_id nullable
+- external_user_id nullable  -- parent portal user id
+- portal_username nullable  -- identifier only
 - token_expires_at nullable
 - last_crawl_at nullable
 - last_error text nullable
 - created_at
 
-Secrets (OAuth tokens, consumer key/secret) are Floot secrets, not columns.
+## lms_child_map
+
+- id
+- lms_connection_id
+- student_id
+- external_child_id
+- external_child_name nullable
+- unique (lms_connection_id, external_child_id)
+- unique (lms_connection_id, student_id)
 
 ## course
 
@@ -58,14 +76,13 @@ Secrets (OAuth tokens, consumer key/secret) are Floot secrets, not columns.
 - lms_provider nullable
 - lms_section_id nullable
 - archived_at nullable
-- unique (student_id, lms_provider, lms_section_id) where those are not null
 
 ## material_folder
 
 - id
 - student_id
-- course_id nullable  -- null = General
-- slug text  -- `general` or course-derived
+- course_id nullable
+- slug text
 - title
 - unique (student_id, course_id)
 
@@ -82,26 +99,23 @@ Secrets (OAuth tokens, consumer key/secret) are Floot secrets, not columns.
 - original_filename
 - mime_type
 - byte_size int
-- storage_key text  -- Floot private storage
+- storage_key text
 - checksum_md5 nullable
 - lms_external_id nullable
-- lms_path text nullable  -- original folder path in Schoology
+- lms_path text nullable
 - lms_downloaded_at nullable
 - summary text nullable
 - ingest_status: `pending` | `ready` | `failed`
 - ingested_at nullable
 - created_at
-- unique (student_id, lms_provider implied via connection, lms_external_id) where lms_external_id is not null
 
 ## extracted_item
-
-Planner fuel pulled from a material or raw LMS assignment object.
 
 - id
 - student_id
 - course_id nullable
 - material_id nullable
-- assignment_id nullable  -- linked once upserted
+- assignment_id nullable
 - kind: `homework` | `quiz` | `test` | `reading` | `project` | `note`
 - title
 - due_on date nullable
@@ -111,8 +125,6 @@ Planner fuel pulled from a material or raw LMS assignment object.
 - created_at
 
 ## course_snapshot
-
-One current picture per course, rewritten after each crawl.
 
 - id
 - student_id
@@ -129,7 +141,7 @@ One current picture per course, rewritten after each crawl.
 
 - id
 - household_id
-- student_id
+- student_id nullable
 - provider text
 - started_at
 - finished_at nullable
@@ -226,7 +238,7 @@ One current picture per course, rewritten after each crawl.
 - id
 - household_id
 - student_id nullable
-- purpose text  -- plan | quiz | coach | critique | solve | ingest | crawl_rollup
+- purpose text
 - model text
 - input_tokens int nullable
 - output_tokens int nullable
@@ -234,11 +246,12 @@ One current picture per course, rewritten after each crawl.
 
 ## Indexing (minimum)
 
+- app_user (username) unique where username is not null
+- app_user (google_sub) unique where google_sub is not null
 - assignment (student_id, status, due_on)
 - material (student_id, folder_id, created_at desc)
-- material (checksum_md5) where not null
 - extracted_item (student_id, due_on)
 - plan_day (student_id, day)
 - plan_item (plan_day_id, sort_order)
 - work_session (student_id, started_at desc)
-- crawl_run (student_id, started_at desc)
+- crawl_run (household_id, started_at desc)
