@@ -11,42 +11,35 @@ Docs + Floot project.
 
 ## Phase 1 — UI scaffold (no backend)
 
-Today + session + parent status + Materials folders. Sample data. Parent badge mock: Connected / Syncing / Action Required.
+Done. Today + session + parent + Materials with sample data.
 
 ## Phase 2 — Household backend
 
-Database + parent login (**Google SSO or email + password**) + student username/password + guardian invites.
+Done enough to log in. Remaining: guardian invite email flow.
 
 ## Phase 3 — Materials ingest (upload first)
 
-Upload, ingest AI, course snapshots, 7-day extracts into the planner.
+Upload into folders. Enforce **tier file + storage caps** (TIERS.md). Ingest AI. Course snapshots. 7-day extracts.
 
 ## Phase 4 — Schoology crawl
 
-- Household parent-portal **OAuth / district token** (not password scrape)
-- Secrets in Floot secret store
-- 14:00 household-tz job, ≤1 req/sec, last 24h files + 7-day dues
-- Status machine + parent badge
-- Failure is non-blocking: Today, sessions, and 23:00 digest still run; upload fallback stays live
-- Reconnect UX when token dies or API returns auth failure
-
-Exit: “Run crawl now” or the 2pm job files at least one material or explains why (reconnect / upload).
+OAuth / district token. 14:00 job. Same caps as upload. Non-blocking failure.
 
 ## Phase 5 — Real tutor loop
 
-Plan, steps, coach, quiz. Step-then-answer.
+Plan, steps, coach, quiz. Step-then-answer. **Review bench:** planner model, reviewer model, referee only on disagreement (REVIEW-BENCH.md).
 
 ## Phase 6 — Parent close-the-loop
 
-Parent home for every kid. `daily_status`. 23:00 digest to every guardian. Digest includes crawl line (ok / missed / action required).
+Parent home. 23:00 digest to every guardian.
 
 ## Phase 7 — Hardening
 
-Empty states, cost cap, reconnect, publish.
+Empty states, AI cost cap, reconnect, publish for our household.
 
-## Phase 8 — Backlog
+## Phase 8 — Distribute
 
-Other LMS adapters, photo/voice, lecture audio, digest mute, native stores. Password-vault + headless crawl only if the board never grants API access *and* we explicitly reopen that decision.
+Public Free / Basic / Pro. Checkout later. Limits already enforced from Phase 3. Then: other LMS adapters, photo/voice, lecture audio, digest mute, native stores.
 
 ## Decision log
 
@@ -60,6 +53,8 @@ Other LMS adapters, photo/voice, lecture audio, digest mute, native stores. Pass
 | 2026-09-03 | Repo = per-course folders + General |
 | 2026-09-03 | Upload-only is a first-class fallback |
 | 2026-09-03 | Guardian digest at 23:00 household tz, every night |
-| 2026-09-05 | Gemini review: take status/UX/log hygiene; reject password vault + Playwright as v1 |
-| 2026-09-05 | Crawl failure never blocks Today or the 11pm digest |
-| 2026-09-05 | Parents sign in with Google SSO **or** email + password |
+| 2026-09-05 | Gemini review: take status/UX; reject password vault + Playwright as v1 |
+| 2026-09-05 | Parents sign in with Google SSO or email + password |
+| 2026-09-05 | Storage caps: 25 MB manual upload, 100 MB platform max per file |
+| 2026-09-05 | Three-model review bench on homework |
+| 2026-09-05 | Public tiers Free / Basic / Pro, gated by files + storage |
