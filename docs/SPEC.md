@@ -24,13 +24,13 @@ Full writeup: AUTH.md.
 
 | Role | App login | Can do |
 | --- | --- | --- |
-| Parent | Google SSO | Own household, add kids, set usernames/passwords, connect Schoology parent portal, view all status, budgets, materials |
+| Parent | Google SSO or other email and password | Own household, add kids, set usernames/passwords, connect Schoology parent portal, view all status, budgets, materials |
 | Student | Username + password set by parent | Own Today, sessions, own materials. No LMS connect. No household settings. |
 
 ### Auth (v1)
 
-- Parents: Google only (Floot `oauth-login`). First Google login creates the household.
-- Extra parents: invite → Google SSO into the same household.
+- Parents: Google or other email and password (Floot `oauth-login`). First login creates the household.
+- Extra parents: invite → Google SSO or other email and password into the same household.
 - Students: parent-created username + password (Floot email/password or equivalent hashed credential). No Google on the kid door.
 - Student session does not expose a sibling switcher. Parent session can open any kid.
 - Under-13 profiles are parent-managed.
@@ -46,7 +46,7 @@ Full writeup: AUTH.md.
 See DATA-MODEL.md. Summary:
 
 - Household
-- App user (parent via Google, student via username)
+- App user (parent via Google or other email and password, student via username)
 - StudentProfile
 - LMS connection (household parent-portal, mapped to students)
 - Course, material folders, materials
@@ -107,7 +107,7 @@ Outline, thesis options, paragraph critique, rubric check. Not a complete draft.
 
 ### 5.6 Parent home
 
-After Google SSO:
+After Google SSO or other email and password:
 
 - Per student: done / total, minutes, stuck notes, tomorrow dues, 7-day assessments
 - Last crawl status
