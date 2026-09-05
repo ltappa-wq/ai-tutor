@@ -15,7 +15,7 @@ Today + session + parent status + Materials folders. Sample data. Parent badge m
 
 ## Phase 2 — Household backend
 
-Database + Google parent SSO + student username/password + guardian invites.
+Database + parent login (**Google SSO or email + password**) + student username/password + guardian invites.
 
 ## Phase 3 — Materials ingest (upload first)
 
@@ -54,7 +54,7 @@ Other LMS adapters, photo/voice, lecture audio, digest mute, native stores. Pass
 | --- | --- |
 | 2026-09-03 | Family-first household app |
 | 2026-09-03 | Steps first, then the worked answer |
-| 2026-09-03 | Parent Google SSO; kids get parent-assigned username/password |
+| 2026-09-03 | Kids get parent-assigned username/password |
 | 2026-09-03 | Co-parents equal; invites; all guardians get household email |
 | 2026-09-03 | Schoology crawl 14:00 household tz; read-only |
 | 2026-09-03 | Repo = per-course folders + General |
@@ -62,3 +62,4 @@ Other LMS adapters, photo/voice, lecture audio, digest mute, native stores. Pass
 | 2026-09-03 | Guardian digest at 23:00 household tz, every night |
 | 2026-09-05 | Gemini review: take status/UX/log hygiene; reject password vault + Playwright as v1 |
 | 2026-09-05 | Crawl failure never blocks Today or the 11pm digest |
+| 2026-09-05 | Parents sign in with Google SSO **or** email + password |
