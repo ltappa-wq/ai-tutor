@@ -1,6 +1,6 @@
 # Auth and household setup
 
-Locked 2026-09-03. Co-parents locked 2026-09-03.
+Locked 2026-09-03. Co-parents locked 2026-09-03. Parent email/password added 2026-09-05.
 
 Two different logins. Do not mix them up.
 
@@ -11,12 +11,23 @@ Two different logins. Do not mix them up.
 
 ### Parents / guardians
 
-- Sign in with **Google SSO** only (Floot `oauth-login`).
-- First Google sign-in creates the household. That person is `creator` only for bookkeeping. **Access is equal.** There is no admin-only screen the second parent cannot open.
-- Add a second or third guardian: any current parent enters their email → we send an invite link → they Google-SSO with that mailbox → they join the household with the **same permissions** as the first parent.
-- Cap: 5 guardians per household (enough for two homes + a grandparent; not a staff directory).
-- No parent username/password in this app. Google is the parent door.
-- A guardian can leave the household. They cannot delete the household if they are the only remaining parent — transfer or add someone first. Any remaining parent can remove another parent (don't be cute with this; log it).
+Parents pick **either** door. Same household powers either way.
+
+- **Google SSO** (Floot `oauth-login`)
+- **Email + password** (Floot `auth`)
+
+Rules:
+
+- First successful parent login (either method) creates the household. That person is `creator` only for bookkeeping. **Access is equal.** There is no admin-only screen the second parent cannot open.
+- Email is required for every parent. It is how invites and the 11pm digest find them.
+- One email = one parent identity. They cannot join a second household with that email in v1.
+- If they later sign in with Google using the same email they already registered, attach `google_sub` to that row. Do not create a second parent.
+- Add a second or third guardian: any current parent enters their email → invite link → they accept with Google **or** email+password using that mailbox → same permissions as the first parent.
+- Cap: 5 guardians per household.
+- Parent passwords (when used) are hashed by Floot auth. Never stored on `app_user`.
+- A guardian can leave the household. They cannot delete the household if they are the only remaining parent — transfer or add someone first. Any remaining parent can remove another parent (log it).
+
+Forgot password: email reset to that guardian address. Google-only parents use Google’s account recovery, not ours.
 
 Every parent can:
 
@@ -30,7 +41,7 @@ Every parent can:
 
 ### Student
 
-- No Google.
+- No Google. No email required.
 - Any parent creates the account: display name, username, password, grade.
 - Student signs in with username + password and lands on **their** Today. No sibling switcher on a student session.
 - Username unique in the app. Password hashed by Floot auth.
@@ -45,9 +56,9 @@ Every parent can:
 ## Invites
 
 - `household_invite`: email, invited_by, expires_at (7 days), status pending/accepted/revoked/expired.
-- Link is single-use. Wrong Google account (email mismatch) is rejected with a clear error.
+- Link is single-use. The accepting account’s email must match the invite (Google email or the address they register).
 - Pending invites list on Settings. Any parent can resend or revoke.
-- Accepting Google SSO that already belongs to another household: blocked. One parent login, one household in v1.
+- An identity already in another household is blocked. One parent login, one household in v1.
 
 ## Email fan-out
 
@@ -55,18 +66,19 @@ Every household email goes to **all current guardians**, not just the creator.
 
 Must fan out:
 
-- Guardian invite (to the invitee only — obvious exception)
+- Guardian invite (to the invitee only)
 - Invite accepted / parent removed (all remaining)
 - Schoology connected, needs reconnect, crawl missed, crawl summary (if enabled)
-- Nightly status digest (when we turn email on)
+- Nightly status digest
 - Student password reset confirmation
+- Parent password reset (that address only)
 - “I'm stuck” optional ping
 
-Use `@floot/email`. One template, N recipients from `app_user` where `role=parent` and household matches. No silent opt-out in v1 except leaving the household. Per-address mute is P1.
+Use `@floot/email`. Recipients: `app_user` where `role=parent`. No silent opt-out in v1 except leaving the household. Per-address mute is P1.
 
 ## Schoology access (separate from app login)
 
-Three rungs. Same repo and crawl job either way.
+Unchanged. App login method does not change LMS rungs.
 
 ### Rung A — district API (target)
 
@@ -74,9 +86,7 @@ Board-approved read-only materials API. Official tokens in Floot secrets.
 
 ### Rung B — parent portal, one household connection (v1 interim)
 
-One `lms_connection` on the household (`scope=household`, `portal_role=parent`). Any guardian may start or finish the connect. Token in Floot secrets. Portal password is not stored. Map each Schoology child → student profile. 2pm job walks every mapped child.
-
-If parent accounts cannot OAuth, Rung B waits on the board. No password-scrape mode.
+One `lms_connection` on the household. Token in Floot secrets. Portal password is not stored.
 
 ### Rung C — upload only
 
@@ -84,7 +94,7 @@ Always on.
 
 ## Setup wizard (first parent)
 
-1. Continue with Google.
+1. Continue with Google **or** register with email + password.
 2. Household name + timezone (default America/Chicago).
 3. Add student: name, grade, username, password. Repeat.
 4. Optional: invite another guardian (email).
