@@ -1,6 +1,6 @@
 # Spec-driven plan
 
-Work only against the docs. Each phase ends with something visible in the Floot preview.
+Work only against the living docs. `GEMINI-*.md` are review artifacts (see REVIEW-GEMINI.md).
 
 ## Phase 0 — Grounding
 
@@ -11,7 +11,7 @@ Docs + Floot project.
 
 ## Phase 1 — UI scaffold (no backend)
 
-Today + session + parent status + Materials folders. Sample data.
+Today + session + parent status + Materials folders. Sample data. Parent badge mock: Connected / Syncing / Action Required.
 
 ## Phase 2 — Household backend
 
@@ -23,7 +23,14 @@ Upload, ingest AI, course snapshots, 7-day extracts into the planner.
 
 ## Phase 4 — Schoology crawl
 
-Household parent-portal connection + 14:00 job.
+- Household parent-portal **OAuth / district token** (not password scrape)
+- Secrets in Floot secret store
+- 14:00 household-tz job, ≤1 req/sec, last 24h files + 7-day dues
+- Status machine + parent badge
+- Failure is non-blocking: Today, sessions, and 23:00 digest still run; upload fallback stays live
+- Reconnect UX when token dies or API returns auth failure
+
+Exit: “Run crawl now” or the 2pm job files at least one material or explains why (reconnect / upload).
 
 ## Phase 5 — Real tutor loop
 
@@ -31,11 +38,7 @@ Plan, steps, coach, quiz. Step-then-answer.
 
 ## Phase 6 — Parent close-the-loop
 
-- Parent home for every kid
-- `daily_status` written from sessions even without an explicit end-night tap
-- **23:00 household-tz digest email to every guardian** (DIGEST.md)
-
-Exit: a sample household gets one mail covering today / tomorrow / next 7 days.
+Parent home for every kid. `daily_status`. 23:00 digest to every guardian. Digest includes crawl line (ok / missed / action required).
 
 ## Phase 7 — Hardening
 
@@ -43,7 +46,7 @@ Empty states, cost cap, reconnect, publish.
 
 ## Phase 8 — Backlog
 
-Other LMS adapters, photo/voice, lecture audio, digest mute, native stores.
+Other LMS adapters, photo/voice, lecture audio, digest mute, native stores. Password-vault + headless crawl only if the board never grants API access *and* we explicitly reopen that decision.
 
 ## Decision log
 
@@ -52,15 +55,10 @@ Other LMS adapters, photo/voice, lecture audio, digest mute, native stores.
 | 2026-09-03 | Family-first household app |
 | 2026-09-03 | Steps first, then the worked answer |
 | 2026-09-03 | Parent Google SSO; kids get parent-assigned username/password |
-| 2026-09-03 | Co-parents are equal; invites; all guardians get household email |
+| 2026-09-03 | Co-parents equal; invites; all guardians get household email |
 | 2026-09-03 | Schoology crawl 14:00 household tz; read-only |
 | 2026-09-03 | Repo = per-course folders + General |
 | 2026-09-03 | Upload-only is a first-class fallback |
 | 2026-09-03 | Guardian digest at 23:00 household tz, every night |
-
-## How we work
-
-1. Change the spec.
-2. Change the plan.
-3. Implement that slice in Floot.
-4. Checkpoint.
+| 2026-09-05 | Gemini review: take status/UX/log hygiene; reject password vault + Playwright as v1 |
+| 2026-09-05 | Crawl failure never blocks Today or the 11pm digest |
