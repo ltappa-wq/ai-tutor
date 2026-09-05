@@ -19,12 +19,13 @@ Passwords and LMS tokens are not columns. See AUTH.md.
 - household_id
 - role: `parent` | `student`
 - display_name
-- email nullable
-- google_sub nullable
-- username nullable
+- email nullable  -- required for parents (Google or email+password); usually null for students
+- google_sub nullable  -- set when they use Google; may be added later to an email account
+- username nullable  -- students only, unique
+- auth_method: `google` | `password` | `google_and_password` | null  -- parents; students are always password via username
 - created_at
 
-Student passwords live in Floot auth. Parents have no app password. All `role=parent` rows in a household are equal.
+Student and parent app passwords live in Floot auth, not this table. All `role=parent` rows in a household are equal.
 
 ## household_invite
 
@@ -258,6 +259,7 @@ Student passwords live in Floot auth. Parents have no app password. All `role=pa
 ## Indexing (minimum)
 
 - app_user (username) unique where username is not null
+- app_user (email) unique where email is not null
 - app_user (google_sub) unique where google_sub is not null
 - household_invite (household_id, email) where status = pending
 - assignment (student_id, status, due_on)
