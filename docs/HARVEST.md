@@ -1,32 +1,35 @@
-# Parent-run harvest (replaces silent Schoology scrape)
+# Parent-run harvest
 
-Locked 2026-09-05.
+Updated 2026-09-17.
 
-The 2pm unattended API crawl is **not** how files get in unless the district later grants an official API. Day to day, a parent who is already logged into Schoology (or Classroom / Canvas) runs the **schoology-harvest** skill in Claude-in-Chrome or a similar computer-use agent.
+Files do **not** come from a silent 2pm Schoology scrape. A parent already logged into Schoology (and PowerSchool) runs a computer-use harvest. Official district APIs stay a future rung.
 
-## Why
+## Staging tree
 
-District portals sit behind Clever / ClassLink / Google SSO and MFA. Saving a school password and scraping at 2pm is brittle and against the earlier lock. A parent-present browser session is the access we actually have.
+```
+Google Drive / AI Tutor Harvest /
+  Joey / {Course} / …packets
+  Joey / Daily Plans / Daily Plan — YYYY-MM-DD
+  Reagan / {Course} / …packets
+  Reagan / Daily Plans / Daily Plan — YYYY-MM-DD
+  _harvest_state.json
+```
 
-## Skill
+Course folder names match the LMS section when possible. Do not invent a folder per file.
 
-- Live copy for Grok: `~/.grok/skills/schoology-harvest/`
-- Repo copy: `skills/schoology-harvest/SKILL.md`
+First run is full. Later runs copy only new ids. `_NOT_COLLECTED_*.md` lists school-domain Drive, Schoology-hosted PDFs, Forms, and blank parent-view agendas — those are not “in Drive.”
 
-Run it on demand ("pull Ava's new Schoology files"). First run is full. Later runs use `manifest.json` and skip known ids.
+## PowerSchool
 
-Downloads live in `~/ai-tutor-harvest/{student}/`. The skill does not log in and does not store passwords.
+Grade snapshots land as `PowerSchool_{Class}_YYYY-MM-DD.json` in the matching course folder (or next to Daily Plans). They feed the daily plan (missing, C or lower, %). They are not the assignment files.
 
 ## Into the app
 
-Until we add a folder-watch uploader, the parent (or the skill, talking to the human) drops **new** files on Materials → course folder. Same ingest AI and tier caps as manual upload.
+Parent imports the student tree on Materials, or a later Drive→app sync. Same ingest + tier caps as upload. See DAILY-PLAN.md for the report the harvest is for.
 
-## What the 2pm job still does
+## Skill
 
-- Remind / status only, or no-op if nothing is connected
-- Never block Today
-- Official API remains a future rung if the board opens it
+- Grok: `~/.grok/skills/schoology-harvest/`
+- Repo: `skills/schoology-harvest/SKILL.md`
 
-## Dues without files
-
-`dues.json` from the harvest can seed `extracted_items` / assignments when we wire an import. Until then, the parent can add the assignment on Today.
+The skill does not store a school password.

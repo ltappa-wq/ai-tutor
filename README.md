@@ -1,21 +1,23 @@
 # AI Tutor
 
-Uses AI to put together a daily plan, help students prepare, guide them through homework, and assist with assignments — without ghostwriting the take-home.
+Family school-night OS: a dated daily plan per child, then a short session to get the next item done.
 
-This repo is the **source of truth for product docs**. The live app is built in Floot.
+This repo is the **source of truth for product docs**. Live app: Floot. Live plans: Google Drive `AI Tutor Harvest / {Kid} / Daily Plans`.
 
 ## Documents
 
 | Doc | Purpose |
 | --- | --- |
 | [docs/VISION.md](docs/VISION.md) | Why this exists |
+| [docs/DAILY-PLAN.md](docs/DAILY-PLAN.md) | Daily report format + Drive folders |
 | [docs/SPEC.md](docs/SPEC.md) | Product requirements |
 | [docs/AUTH.md](docs/AUTH.md) | Parent and student login |
-| [docs/DIGEST.md](docs/DIGEST.md) | 11pm status email |
+| [docs/DIGEST.md](docs/DIGEST.md) | 11pm email of the daily plan |
+| [docs/HARVEST.md](docs/HARVEST.md) | Schoology + PowerSchool → Drive |
 | [docs/FEATURES.md](docs/FEATURES.md) | P0/P1/P2/Out |
-| [docs/MATERIALS.md](docs/MATERIALS.md) | Repo + Schoology crawl |
-| [docs/REVIEW-BENCH.md](docs/REVIEW-BENCH.md) | Planner / reviewer / referee models |
-| [docs/TIERS.md](docs/TIERS.md) | Free / Basic / Pro limits |
+| [docs/MATERIALS.md](docs/MATERIALS.md) | In-app repo |
+| [docs/REVIEW-BENCH.md](docs/REVIEW-BENCH.md) | Planner / reviewer / referee |
+| [docs/TIERS.md](docs/TIERS.md) | Free / Basic / Pro |
 | [docs/PLAN.md](docs/PLAN.md) | Build phases |
 | [docs/DATA-MODEL.md](docs/DATA-MODEL.md) | Schema |
 
